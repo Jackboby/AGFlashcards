@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>American Gov Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=B612+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'B612 Mono', monospace;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        /* 3D Flip Card Styles */
+        .flip-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 32rem; /* 512px */
+            height: 24rem; /* 384px */
+            margin: 0 auto;
+        }
+
+        .flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-container.flipped .flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background-color: #1e1e1e;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border: 1px solid #2a2a2a;
+        }
+
+        .flip-back {
+            transform: rotateY(180deg);
+            background-color: #1a1a24;
+            border-color: #2d2d3a;
+        }
+
+        .highlight {
+            color: #fa6e52;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(250, 110, 82, 0.3);
+        }
+
+        .card-label {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Custom Button Hover Effects */
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(250, 110, 82, 0.2);
+        }
+        .control-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
+
+    <div class="w-full max-w-3xl flex flex-col items-center gap-6">
+        
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">American Gov Study</h1>
+            <p id="progress-indicator" class="text-gray-400 font-medium tracking-wide">Card 1 of 20</p>
+        </div>
+
+        <!-- Flashcard -->
+        <div class="flip-container group" id="flashcard" onclick="toggleFlip()">
+            <div class="flip-inner" id="flip-inner">
+                
+                <!-- Front Side (Question) -->
+                <div class="flip-front">
+                    <span class="card-label">Question</span>
+                    <h2 id="card-question" class="text-xl sm:text-2xl font-semibold leading-relaxed text-gray-100">
+                        <!-- Question text injected here -->
+                    </h2>
+                    <p class="absolute bottom-4 text-xs text-gray-500 animate-pulse">Click to flip</p>
+                </div>
+
+                <!-- Back Side (Answer & Remember) -->
+                <div class="flip-back flex-col justify-center items-start text-left space-y-6">
+                    <span class="card-label">Answer</span>
+                    
+                    <div class="w-full">
+                        <h3 class="text-lg text-gray-400 mb-1 text-sm uppercase tracking-wider font-bold">Answer:</h3>
+                        <p id="card-answer" class="text-xl sm:text-2xl text-white font-medium leading-snug">
+                            <!-- Answer text injected here -->
+                        </p>
+                    </div>
+
+                    <div class="w-full bg-[#121212] p-4 rounded-lg border border-gray-800">
+                        <h3 class="text-sm text-[#fa6e52] mb-1 uppercase tracking-wider font-bold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Remember:
+                        </h3>
+                        <p id="card-remember" class="text-base text-gray-300 leading-relaxed">
+                            <!-- Remember text injected here -->
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-wrap justify-center gap-3 w-full max-w-lg mt-4">
+            <button onclick="prevCard()" class="control-btn bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Prev
+            </button>
+            
+            <button onclick="toggleFlip()" class="control-btn border border-[#fa6e52] text-[#fa6e52] hover:bg-[#fa6e52] hover:text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Flip
+            </button>
+            
+            <button onclick="nextCard()" class="control-btn bg-[#fa6e52] hover:bg-[#e65c40] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            
+            <button onclick="shuffleDeck()" class="control-btn bg-gray-800 hover:bg-gray-700 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center ml-2" title="Shuffle Cards">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Original ordered data array with pre-formatted highlight tags
+        const originalFlashcards = [
+            {
+                q: "Which of the following best defines the principle of popular sovereignty?",
+                a: "The ultimate source of governmental authority is <span class='highlight'>the people</span>.",
+                r: "Popular = people → sovereignty = power. → <span class='highlight'>The people hold the power</span>."
+            },
+            {
+                q: "Which complaint was the greatest barrier to ratifying the Constitution?",
+                a: "It did not include a <span class='highlight'>Bill of Rights</span>.",
+                r: "Many feared the new government could <span class='highlight'>violate people's freedoms</span> without one."
+            },
+            {
+                q: "“Life, liberty, and property” — Locke / “Life, Liberty and the pursuit of Happiness” — Declaration of Independence",
+                a: "<span class='highlight'>Natural rights</span>.",
+                r: "Natural rights are rights you have <span class='highlight'>simply because you're human</span>—government doesn't give them to you."
+            },
+            {
+                q: "The Articles of Confederation reflected Americans’ fear of:",
+                a: "A <span class='highlight'>strong central government</span>.",
+                r: "After fighting Britain, Americans were suspicious of <span class='highlight'>centralized power</span>."
+            },
+            {
+                q: "Thomas Paine was influenced by Rousseau’s argument that a government should be dissolved if it:",
+                a: "Acted contrary to the <span class='highlight'>general will</span>.",
+                r: "Rousseau → government exists to serve <span class='highlight'>the will of the people</span>."
+            },
+            {
+                q: "The Preamble to the Constitution lists which of the following?",
+                a: "The <span class='highlight'>purpose</span> to be served by the Constitution.",
+                r: "<span class='highlight'>“We the People…”</span> introduces what the Constitution is meant to accomplish."
+            },
+            {
+                q: "Why did the framers create three separate branches of government?",
+                a: "To keep any one group from gaining <span class='highlight'>too much power</span>.",
+                r: "Three branches = <span class='highlight'>power divided</span>."
+            },
+            {
+                q: "What is the defining characteristic of a federal system?",
+                a: "Power is <span class='highlight'>divided between central and regional</span> governments.",
+                r: "Federal = <span class='highlight'>shared power</span> between national and state governments."
+            },
+            {
+                q: "Best example of constitutional checks and balances?",
+                a: "<span class='highlight'>Treaties require Senate approval</span>.",
+                r: "The president negotiates treaties, but the <span class='highlight'>Senate checks that power</span> by approving them."
+            },
+            {
+                q: "The process of amending the Constitution involves both:",
+                a: "<span class='highlight'>Congress and the states</span>.",
+                r: "Changing the Constitution requires <span class='highlight'>national + state participation</span>."
+            },
+            {
+                q: "Which plays the largest role in interpreting the Bill of Rights?",
+                a: "The <span class='highlight'>Supreme Court</span>.",
+                r: "Courts decide what constitutional rights <span class='highlight'>mean in actual cases</span>."
+            },
+            {
+                q: "Which unpopular form of expression is protected by the First Amendment?",
+                a: "<span class='highlight'>Flag burning</span>.",
+                r: "The First Amendment protects expression—even <span class='highlight'>unpopular expression</span>."
+            },
+            {
+                q: "The Fifth, Sixth, Seventh, and Eighth Amendments protect:",
+                a: "Rights in the <span class='highlight'>legal system</span>.",
+                r: "These amendments are heavily about <span class='highlight'>trials, punishment, and due process</span>."
+            },
+            {
+                q: "“You have the right to remain silent” reflects the provision regarding:",
+                a: "<span class='highlight'>Self-incrimination</span>.",
+                r: "You don't have to <span class='highlight'>incriminate yourself</span> by answering questions."
+            },
+            {
+                q: "What does “prior restraint” refer to?",
+                a: "<span class='highlight'>Preventing publication</span> of certain material.",
+                r: "Prior = before; government <span class='highlight'>stops speech before</span> it's published."
+            },
+            {
+                q: "The national government must guarantee that every state government:",
+                a: "Has a <span class='highlight'>republican structure</span>.",
+                r: "The Constitution requires states to have <span class='highlight'>representative government</span>, not direct rule by a monarch."
+            },
+            {
+                q: "What was devolution, advocated by Nixon and Reagan, aimed at?",
+                a: "<span class='highlight'>Transferring power back to the states</span>.",
+                r: "Devolution = devolve/devolve downward → <span class='highlight'>national → state power</span>."
+            },
+            {
+                q: "What best defines gerrymandering?",
+                a: "Drawing legislative district boundaries to <span class='highlight'>give one group an advantage</span>.",
+                r: "Gerrymandering = <span class='highlight'>manipulating district lines</span> for political advantage."
+            },
+            {
+                q: "Which unit of government is most likely to regulate water systems, cemeteries, hospitals, sewers, fire protection, and schools?",
+                a: "A <span class='highlight'>special-purpose district</span>.",
+                r: "Special-purpose = created to handle <span class='highlight'>specific local services</span>."
+            },
+            {
+                q: "Which form of city government combines democratic rule with professional expertise and is most common today?",
+                a: "<span class='highlight'>Council-manager</span>.",
+                r: "Council = <span class='highlight'>elected officials</span>; manager = <span class='highlight'>professional administrator</span>."
+            }
+        ];
+
+        // State variables
+        let flashcards = [...originalFlashcards];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        // DOM Elements
+        const cardContainer = document.getElementById('flashcard');
+        const questionEl = document.getElementById('card-question');
+        const answerEl = document.getElementById('card-answer');
+        const rememberEl = document.getElementById('card-remember');
+        const progressEl = document.getElementById('progress-indicator');
+
+        // Initialize the first card
+        function renderCard(index) {
+            const card = flashcards[index];
+            questionEl.innerHTML = card.q;
+            answerEl.innerHTML = card.a;
+            rememberEl.innerHTML = card.r;
+            progressEl.textContent = `Card ${index + 1} of ${flashcards.length}`;
+            
+            // Ensure card starts on front when navigating
+            if (isFlipped) {
+                cardContainer.classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                cardContainer.classList.add('flipped');
+            } else {
+                cardContainer.classList.remove('flipped');
+            }
+        }
+
+        // Delay updating text until card flips back to prevent spoiling next question
+        function nextCard() {
+            if (isFlipped) toggleFlip();
+            
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % flashcards.length;
+                renderCard(currentIndex);
+            }, isFlipped ? 300 : 0); // Wait for unflip animation if necessary
+        }
+
+        function prevCard() {
+            if (isFlipped) toggleFlip();
+            
+            setTimeout(() => {
+                currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+                renderCard(currentIndex);
+            }, isFlipped ? 300 : 0);
+        }
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleDeck() {
+            // Unflip if flipped
+            if (isFlipped) toggleFlip();
+            
+            setTimeout(() => {
+                for (let i = flashcards.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+                }
+                currentIndex = 0; // Reset to start of new shuffled deck
+                renderCard(currentIndex);
+                
+                // Show a quick visual indicator that it shuffled
+                progressEl.textContent = `Shuffled! Card 1 of ${flashcards.length}`;
+                progressEl.classList.add('text-[#fa6e52]');
+                setTimeout(() => {
+                    progressEl.classList.remove('text-[#fa6e52]');
+                    progressEl.textContent = `Card 1 of ${flashcards.length}`;
+                }, 1500);
+            }, isFlipped ? 300 : 0);
+        }
+
+        // Handle keyboard navigation (Left/Right arrows and Space to flip)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // Prevent page scrolling
+                toggleFlip();
+            } else if (e.code === 'ArrowRight') {
+                nextCard();
+            } else if (e.code === 'ArrowLeft') {
+                prevCard();
+            }
+        });
+
+        // Initial render
+        renderCard(currentIndex);
+
+    </script>
+</body>
+</html>
